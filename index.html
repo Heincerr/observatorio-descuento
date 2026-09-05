@@ -1,1 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observatorio del Descuento</title>
+<meta name="description" content="Serie diaria e independiente de precios del comercio electrónico colombiano.">
+<style>
+  :root{
+    --fondo:#F5F5F7;
+    --superficie:#FFFFFF;
+    --tinta:#1D1D1F;
+    --gris:#6E6E73;
+    --linea:#E3E3E6;
+    --azul:#0066CC;
+    --alza:#B42318;
+    --baja:#1D6F42;
+    --radio:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--fondo);
+    color:var(--tinta);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",
+                Roboto,Helvetica,Arial,sans-serif;
+    font-size:17px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .envoltura{max-width:940px;margin:0 auto;padding:0 24px}
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
 
+  /* --- Encabezado --- */
+  header{padding:88px 0 56px}
+  h1{
+    font-size:clamp(38px,6vw,60px);
+    line-height:1.06;
+    letter-spacing:-.032em;
+    font-weight:700;
+    max-width:16ch;
+  }
+  .bajada{
+    margin-top:22px;
+    max-width:56ch;
+    font-size:20px;
+    line-height:1.45;
+    color:var(--gris);
+  }
+  .estado{
+    margin-top:30px;
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    font-size:14px;
+    color:var(--gris);
+  }
+  .punto{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--baja);
+    flex:none;
+  }
+
+  /* --- Pieza principal: la línea de precio --- */
+  .destacado{
+    background:var(--superficie);
+    border-radius:var(--radio);
+    padding:40px;
+    margin-bottom:14px;
+  }
+  .destacado h2{
+    font-size:13px;
+    font-weight:600;
+    color:var(--gris);
+    letter-spacing:0;
+    margin-bottom:26px;
+  }
+  .producto{
+    font-size:19px;
+    font-weight:600;
+    letter-spacing:-.012em;
+    margin-bottom:26px;
+    word-break:break-word;
+  }
+  .lineas{display:grid;gap:14px;max-width:520px}
+  .linea{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:20px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--linea);
+  }
+  .linea:last-child{border-bottom:0;padding-bottom:0}
+  .etiqueta{font-size:15px;color:var(--gris)}
+  .valor{font-size:22px;font-weight:600;letter-spacing:-.02em}
+  .valor.tachado{text-decoration:line-through;color:var(--gris);font-weight:400}
+  .valor.alza{color:var(--alza)}
+  .veredicto{
+    margin-top:28px;
+    padding-top:24px;
+    border-top:1px solid var(--linea);
+    font-size:17px;
+    max-width:60ch;
+    color:var(--gris);
+  }
+  .veredicto strong{color:var(--tinta);font-weight:600}
+
+  /* --- Cifras --- */
+  .cifras{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:14px;
+  }
+  .cifra{
+    background:var(--superficie);
+    border-radius:var(--radio);
+    padding:26px 24px;
+  }
+  .cifra b{
+    display:block;
+    font-size:34px;
+    font-weight:600;
+    letter-spacing:-.028em;
+    line-height:1.1;
+  }
+  .cifra span{display:block;margin-top:6px;font-size:14px;color:var(--gris)}
+
+  /* --- Tabla --- */
+  .panel{
+    background:var(--superficie);
+    border-radius:var(--radio);
+    padding:34px 40px 12px;
+  }
+  .cabecera-panel{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+  }
+  .cabecera-panel h2{font-size:22px;font-weight:600;letter-spacing:-.018em}
+  .filtros{display:flex;gap:8px;flex-wrap:wrap}
+  .filtro{
+    font:inherit;font-size:14px;
+    padding:6px 15px;
+    border:0;border-radius:980px;
+    background:var(--fondo);
+    color:var(--gris);
+    cursor:pointer;
+  }
+  .filtro[aria-pressed="true"]{background:var(--azul);color:#fff}
+  .filtro:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+
+  table{width:100%;border-collapse:collapse;margin-top:22px}
+  th{
+    text-align:left;
+    font-size:13px;
+    font-weight:500;
+    color:var(--gris);
+    padding:0 0 12px;
+    border-bottom:1px solid var(--linea);
+  }
+  th.der,td.der{text-align:right}
+  td{padding:16px 0;border-bottom:1px solid var(--linea);font-size:15px;vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  .ref{font-weight:600;line-height:1.35;max-width:34ch}
+  .tienda{color:var(--gris);font-size:13px;margin-top:2px}
+  .variacion{font-weight:600}
+  .variacion.alza{color:var(--alza)}
+  .variacion.baja{color:var(--baja)}
+  .quieto{color:var(--gris)}
+  .traza{display:block}
+
+  /* --- Estados y pie --- */
+  .aviso{
+    background:var(--superficie);
+    border-radius:var(--radio);
+    padding:48px 40px;
+    color:var(--gris);
+    max-width:60ch;
+  }
+  .aviso b{display:block;color:var(--tinta);font-weight:600;margin-bottom:8px}
+  footer{
+    padding:56px 0 80px;
+    color:var(--gris);
+    font-size:14px;
+    max-width:62ch;
+  }
+  footer p+p{margin-top:12px}
+  footer a{color:var(--azul);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  section{margin-bottom:14px}
+
+  @media (max-width:760px){
+    header{padding:56px 0 40px}
+    .cifras{grid-template-columns:repeat(2,1fr)}
+    .destacado,.panel{padding:28px 22px}
+    .panel{padding-bottom:8px}
+    .oculta-movil{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="envoltura">
+
+  <header>
+    <h1>Qué costaba antes ese producto</h1>
+    <p class="bajada">
+      Una tienda puede mostrar cualquier precio como valor anterior, y nadie
+      está obligado a probarlo. Este observatorio guarda el precio de cada
+      producto todos los días, para que el descuento anunciado se pueda
+      contrastar con lo que el precio fue de verdad.
+    </p>
+    <p class="estado" id="estado"><span class="punto"></span>Cargando la serie</p>
+  </header>
+
+  <main id="contenido">
+    <div class="aviso"><b>Leyendo las capturas</b>Un momento.</div>
+  </main>
+
+  <footer>
+    <p>
+      Los precios se capturan una vez al día de forma automatizada, solo
+      sobre información pública de producto, respetando las directivas de
+      exclusión de cada sitio. Las observaciones fallidas también se
+      registran: un vacío en la serie no es lo mismo que un precio que no
+      cambió.
+    </p>
+    <p>
+      Harry Heincer Jawer Sanchez Arango · Universidad Colegio Mayor de
+      Cundinamarca · <a href="https://github.com/Heincerr/observatorio-descuento">Datos y código</a>
+    </p>
+  </footer>
+
+</div>
+
+<script>
+const REPO = "Heincerr/observatorio-descuento";
+
+const pesos = n => "$" + Math.round(n).toLocaleString("es-CO");
+const fecha = f => {
+  const [a,m,d] = f.split("-");
+  const meses = ["ene","feb","mar","abr","may","jun",
+                 "jul","ago","sep","oct","nov","dic"];
+  return `${+d} ${meses[+m-1]}`;
+};
+
+/* Analizador de CSV que respeta comillas y comas dentro de campos. */
+function leerCSV(texto){
+  const filas = [];
+  let campo = "", fila = [], enComillas = false;
+  for (let i = 0; i < texto.length; i++){
+    const c = texto[i];
+    if (enComillas){
+      if (c === '"'){
+        if (texto[i+1] === '"'){ campo += '"'; i++; }
+        else enComillas = false;
+      } else campo += c;
+    } else if (c === '"') enComillas = true;
+    else if (c === ","){ fila.push(campo); campo = ""; }
+    else if (c === "\n"){ fila.push(campo); filas.push(fila); fila = []; campo = ""; }
+    else if (c !== "\r") campo += c;
+  }
+  if (campo || fila.length){ fila.push(campo); filas.push(fila); }
+  if (!filas.length) return [];
+  const cab = filas.shift();
+  return filas
+    .filter(f => f.length >= cab.length - 1 && f.some(v => v !== ""))
+    .map(f => Object.fromEntries(cab.map((c,i) => [c.trim(), (f[i] ?? "").trim()])));
+}
+
+/* Dibuja la trayectoria del precio como una línea sencilla. */
+/* Nombre del producto. Si la captura no lo trajo, se reconstruye del enlace. */
+function nombrar(r){
+  if (r.nombre) return r.nombre;
+  const trozo = (r.url.split("/p/")[0] || "").split("/").pop() || "";
+  if (!trozo) return r.id;
+  return decodeURIComponent(trozo).replace(/-/g, " ")
+    .replace(/^./, c => c.toUpperCase());
+}
+
+function traza(valores){
+  if (valores.length < 2) return "";
+  const an = 108, al = 26, p = 3;
+  const min = Math.min(...valores), max = Math.max(...valores);
+  const rango = max - min || 1;
+  const puntos = valores.map((v,i) => {
+    const x = p + i * (an - 2*p) / (valores.length - 1);
+    const y = al - p - ((v - min) / rango) * (al - 2*p);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const sube = valores[valores.length-1] > valores[0];
+  const color = valores[valores.length-1] === valores[0]
+    ? "var(--gris)" : (sube ? "var(--alza)" : "var(--baja)");
+  const [ux,uy] = puntos.split(" ").pop().split(",");
+  return `<svg class="traza" width="${an}" height="${al}" viewBox="0 0 ${an} ${al}"
+    role="img" aria-label="Trayectoria del precio">
+    <polyline points="${puntos}" fill="none" stroke="${color}"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${ux}" cy="${uy}" r="2.4" fill="${color}"/></svg>`;
+}
+
+async function cargar(){
+  const estado = document.getElementById("estado");
+  const salida = document.getElementById("contenido");
+
+  let archivos;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/datos`);
+    if (!r.ok) throw new Error(r.status);
+    archivos = (await r.json())
+      .filter(a => a.name.endsWith(".csv"))
+      .sort((a,b) => a.name.localeCompare(b.name));
+  } catch (e) {
+    estado.innerHTML = "";
+    salida.innerHTML = `<div class="aviso"><b>No se pudo leer la carpeta de datos</b>
+      El repositorio debe ser público y contener una carpeta <code>datos</code>
+      con las capturas diarias.</div>`;
+    return;
+  }
+
+  if (!archivos.length){
+    estado.innerHTML = "";
+    salida.innerHTML = `<div class="aviso"><b>La serie todavía no empieza</b>
+      Ejecuta la captura diaria y vuelve a abrir esta página.</div>`;
+    return;
+  }
+
+  const textos = await Promise.all(
+    archivos.map(a => fetch(a.download_url).then(r => r.text()).catch(() => "")));
+
+  /* Cada referencia acumula sus observaciones válidas por día. */
+  const refs = new Map();
+  const dias = new Set();
+  for (const t of textos){
+    for (const f of leerCSV(t)){
+      const precio = parseFloat(f.precio);
+      if (!f.id_referencia || !isFinite(precio)) continue;
+      if (f.estado !== "ok") continue;
+      const dia = (f.momento_utc || "").slice(0,10);
+      if (!dia) continue;
+      dias.add(dia);
+      if (!refs.has(f.id_referencia)){
+        refs.set(f.id_referencia, {
+          id: f.id_referencia,
+          tienda: f.minorista || "",
+          url: f.url || "",
+          obs: new Map(),
+          referencia: null,
+          nombre: "",
+        });
+      }
+      const r = refs.get(f.id_referencia);
+      r.obs.set(dia, precio);
+      const anunciado = parseFloat(f.precio_referencia);
+      if (isFinite(anunciado)) r.referencia = anunciado;
+      if (f.nombre && f.nombre.length > r.nombre.length) r.nombre = f.nombre;
+    }
+  }
+
+  const lista = [...refs.values()].map(r => {
+    const fechas = [...r.obs.keys()].sort();
+    const serie = fechas.map(f => r.obs.get(f));
+    const actual = serie[serie.length-1];
+    return {...r, fechas, serie, actual,
+            minimo: Math.min(...serie),
+            variacion: serie.length > 1 ? (actual/serie[0] - 1) * 100 : 0};
+  }).filter(r => r.serie.length);
+
+  const diasOrden = [...dias].sort();
+  const subieron = lista.filter(r => r.variacion > 0.5);
+  const bajaron  = lista.filter(r => r.variacion < -0.5);
+  const tiendas  = [...new Set(lista.map(r => r.tienda))].sort();
+
+  estado.innerHTML = `<span class="punto"></span>${diasOrden.length}
+    ${diasOrden.length === 1 ? "día capturado" : "días capturados"},
+    desde el ${fecha(diasOrden[0])}. Última captura: ${fecha(diasOrden[diasOrden.length-1])}.`;
+
+  /* Pieza principal: la referencia con mayor alza, que es el caso que la
+     verificación externa permite detectar y el consumidor no. */
+  const caso = [...lista].sort((a,b) => b.variacion - a.variacion)[0];
+  let destacado = "";
+  if (caso && caso.variacion > 0.5){
+    const nombre = nombrar(caso);
+    destacado = `
+    <section class="destacado">
+      <h2>La mayor alza registrada en la serie</h2>
+      <p class="producto">${nombre}</p>
+      <div class="lineas">
+        <div class="linea">
+          <span class="etiqueta">Precio el ${fecha(caso.fechas[0])}</span>
+          <span class="valor tachado num">${pesos(caso.serie[0])}</span>
+        </div>
+        <div class="linea">
+          <span class="etiqueta">Precio el ${fecha(caso.fechas[caso.fechas.length-1])}</span>
+          <span class="valor alza num">${pesos(caso.actual)}</span>
+        </div>
+        <div class="linea">
+          <span class="etiqueta">Mínimo observado</span>
+          <span class="valor num">${pesos(caso.minimo)}</span>
+        </div>
+      </div>
+      <p class="veredicto">
+        Si mañana esta ficha anuncia un descuento sobre
+        <strong>${pesos(caso.actual)}</strong>, la rebaja se calculará sobre un
+        precio que subió <strong>${caso.variacion.toFixed(0)}%</strong> en
+        ${caso.fechas.length} observaciones. Frente al mínimo que hemos visto,
+        el ahorro real sería otro.
+      </p>
+    </section>`;
+  }
+
+  const cifras = `
+    <section class="cifras">
+      <div class="cifra"><b class="num">${lista.length}</b><span>referencias en seguimiento</span></div>
+      <div class="cifra"><b class="num">${diasOrden.length}</b><span>días de serie</span></div>
+      <div class="cifra"><b class="num">${subieron.length}</b><span>subieron de precio</span></div>
+      <div class="cifra"><b class="num">${bajaron.length}</b><span>bajaron de precio</span></div>
+    </section>`;
+
+  const filtros = ["Todas", ...tiendas].map((t,i) =>
+    `<button class="filtro" data-t="${t}" aria-pressed="${i===0}">${t}</button>`).join("");
+
+  salida.innerHTML = destacado + cifras + `
+    <section class="panel">
+      <div class="cabecera-panel">
+        <h2>Movimiento por producto</h2>
+        <div class="filtros">${filtros}</div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Producto</th>
+          <th class="oculta-movil">Trayectoria</th>
+          <th class="der">Mínimo</th>
+          <th class="der">Hoy</th>
+          <th class="der">Variación</th>
+        </tr></thead>
+        <tbody id="cuerpo"></tbody>
+      </table>
+    </section>`;
+
+  const cuerpo = document.getElementById("cuerpo");
+  function pintar(tienda){
+    const vista = [...lista]
+      .filter(r => tienda === "Todas" || r.tienda === tienda)
+      .sort((a,b) => Math.abs(b.variacion) - Math.abs(a.variacion))
+      .slice(0,40);
+    cuerpo.innerHTML = vista.map(r => {
+      const clase = r.variacion > 0.5 ? "alza" : (r.variacion < -0.5 ? "baja" : "quieto");
+      const signo = r.variacion > 0 ? "+" : "";
+      const texto = Math.abs(r.variacion) < 0.5
+        ? "sin cambio" : `${signo}${r.variacion.toFixed(1)}%`;
+      return `<tr>
+        <td><div class="ref">${nombrar(r)}</div>
+            <div class="tienda">${r.tienda} · ${r.id}</div></td>
+        <td class="oculta-movil">${traza(r.serie)}</td>
+        <td class="der num">${pesos(r.minimo)}</td>
+        <td class="der num">${pesos(r.actual)}</td>
+        <td class="der num variacion ${clase}">${texto}</td>
+      </tr>`;
+    }).join("");
+  }
+  pintar("Todas");
+
+  salida.querySelectorAll(".filtro").forEach(b => {
+    b.addEventListener("click", () => {
+      salida.querySelectorAll(".filtro")
+        .forEach(o => o.setAttribute("aria-pressed", o === b));
+      pintar(b.dataset.t);
+    });
+  });
+}
+
+cargar();
+</script>
+</body>
+</html>
