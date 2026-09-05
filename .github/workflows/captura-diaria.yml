@@ -38,11 +38,8 @@ jobs:
           mkdir -p datos
           FECHA=$(date -u +%Y-%m-%d)
           sqlite3 precios.db -header -csv \
-            "SELECT id_referencia, minorista, categoria, url, momento_utc,
-                    precio, precio_lista, moneda, disponibilidad,
-                    metodo, estado, detalle_error, html_hash
-             FROM observaciones
-             ORDER BY id_referencia;" > "datos/${FECHA}.csv"
+            "SELECT * FROM observaciones ORDER BY id_referencia, momento_utc;" \
+            > "datos/${FECHA}.csv"
           echo "Filas exportadas: $(( $(wc -l < datos/${FECHA}.csv) - 1 ))"
 
       - name: Archivar robots.txt como evidencia
