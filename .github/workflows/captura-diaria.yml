@@ -1,0 +1,69 @@
+name: Captura diaria de precios
+
+on:
+  schedule:
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: captura-diaria
+  cancel-in-progress: false
+
+jobs:
+  capturar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install requests beautifulsoup4
+
+      - name: Ejecutar la captura
+        continue-on-error: true
+        run: python captura_precios.py
+
+      - name: Exportar la observacion del dia a CSV
+        run: |
+          mkdir -p datos
+          FECHA=$(date -u +%Y-%m-%d)
+          sqlite3 precios.db -header -csv \
+            "SELECT id_referencia, minorista, categoria, url, momento_utc,
+                    precio, precio_lista, moneda, disponibilidad,
+                    metodo, estado, detalle_error, html_hash
+             FROM observaciones
+             ORDER BY id_referencia;" > "datos/${FECHA}.csv"
+          echo "Filas exportadas: $(( $(wc -l < datos/${FECHA}.csv) - 1 ))"
+
+      - name: Archivar robots.txt como evidencia
+        continue-on-error: true
+        run: |
+          mkdir -p evidencia/$(date -u +%Y-%m-%d)
+          for D in exito.com falabella.com.co ktronix.com alkosto.com; do
+            curl -sS -A "ObservatorioDescuento/1.0 (investigacion academica)" \
+              --max-time 30 "https://www.${D}/robots.txt" \
+              -o "evidencia/$(date -u +%Y-%m-%d)/${D}-robots.txt" || true
+            sleep 3
+          done
+
+      - name: Registrar la captura en el historial
+        run: |
+          git config user.name  "observatorio-bot"
+          git config user.email "actions@github.com"
+          git add datos evidencia
+          if git diff --staged --quiet; then
+            echo "Sin cambios que registrar."
+          else
+            git commit -m "Captura $(date -u +%Y-%m-%d)"
+            git push
+          fi
