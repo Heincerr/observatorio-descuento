@@ -8,6 +8,7 @@ Cambios frente a la v1:
   2. JSON-LD anclado al producto de la ficha, no al primer precio que aparezca.
   3. Conversión numérica que entiende notación científica (1.2629017E7).
   4. Huella SHA-256 estable, verificable entre ejecuciones.
+  7. Guarda el nombre del producto, no solo su código.
   5. Guarda el extracto crudo del dato como respaldo probatorio.
   6. Marca como sospechosos los precios implausibles en lugar de guardarlos callado.
 
@@ -85,6 +86,7 @@ CREATE INDEX IF NOT EXISTS idx_ref_momento
 
 # Columnas nuevas de la v2. Se agregan sin tocar los datos ya capturados.
 COLUMNAS_NUEVAS = [
+    ("nombre", "TEXT"),              # nombre del producto según la ficha
     ("precio_referencia", "REAL"),   # el valor tachado que anuncia la tienda
     ("descuento_anunciado", "REAL"),  # porcentaje que se deriva de ese valor
     ("metodo_referencia", "TEXT"),   # de dónde se sacó el precio tachado
@@ -95,7 +97,7 @@ COLUMNAS_NUEVAS = [
 CAMPOS = [
     "id_referencia", "minorista", "categoria", "url", "momento_utc",
     "precio", "precio_lista", "moneda", "disponibilidad", "metodo",
-    "estado", "detalle_error", "html_hash",
+    "estado", "detalle_error", "html_hash", "nombre",
     "precio_referencia", "descuento_anunciado", "metodo_referencia",
     "extracto", "version_captura",
 ]
@@ -318,6 +320,46 @@ def extraer_desde_selector(sopa, selector_css):
     return None
 
 
+# --- Nombre del producto ----------------------------------------------------
+
+def extraer_nombre(sopa, url):
+    """
+    Nombre legible de la ficha. Sin esto los productos solo se identifican
+    por su código, que no dice nada a quien lee los resultados.
+    Se prefiere el dato estructurado; si falta, el título de la página.
+    """
+    ident = id_desde_url(url)
+
+    for etiqueta in sopa.find_all("script", type="application/ld+json"):
+        try:
+            datos = json.loads(etiqueta.string or "")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        productos = [d for d in _recorrer(datos)
+                     if isinstance(d, dict) and _es_producto(d)]
+        elegidos = [p for p in productos if _coincide(p, ident, url)]
+        if not elegidos and len(productos) == 1:
+            elegidos = productos
+        for p in elegidos:
+            nombre = p.get("name")
+            if nombre and str(nombre).strip():
+                return str(nombre).strip()[:180]
+
+    for attrs in ({"property": "og:title"}, {"name": "title"}):
+        etiqueta = sopa.find("meta", attrs=attrs)
+        if etiqueta and etiqueta.get("content", "").strip():
+            return etiqueta["content"].strip()[:180]
+
+    h1 = sopa.find("h1")
+    if h1 and h1.get_text().strip():
+        return h1.get_text().strip()[:180]
+
+    if sopa.title and sopa.title.string:
+        return sopa.title.string.strip()[:180]
+
+    return None
+
+
 # --- Precio de referencia (el valor tachado) ---------------------------------
 
 # Las plataformas VTEX incrustan el precio de lista en los datos internos
@@ -444,6 +486,8 @@ def capturar(fila, sesion):
             # lo que permite verificar la integridad del registro después.
             reg["html_hash"] = hashlib.sha256(html.encode("utf-8")).hexdigest()
 
+            reg["nombre"] = extraer_nombre(sopa, url)
+
             resultado = (
                 extraer_desde_jsonld(sopa, url)
                 or extraer_desde_meta(sopa)
@@ -514,7 +558,8 @@ def main():
         etiqueta = f"[{i}/{len(referencias)}] {reg['id_referencia']}"
         if reg["estado"] == "ok":
             ok += 1
-            linea = f"{etiqueta}: {reg['precio']:,.0f} ({reg['metodo']})"
+            titulo = (reg.get("nombre") or reg["id_referencia"])[:44]
+            linea = f"{etiqueta}: {titulo} — {reg['precio']:,.0f}"
             if reg.get("precio_referencia"):
                 con_referencia += 1
                 linea += (f" | antes {reg['precio_referencia']:,.0f}"
