@@ -1,0 +1,61 @@
+# Cloudflare Content Signals
+User-agent: *
+Content-Signal: search=yes, ai-train=no
+Allow: /
+
+# Google Ads bots (necesarios para medición y anuncios)
+User-agent: AdsBot-Mobile-Web-Android
+Allow: /
+
+User-agent: AdsBot-Mobile-Web
+Allow: /
+
+# IA / LLMs
+User-agent: GPTBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Áreas privadas / no indexables
+Disallow: /account/
+Disallow: /login
+Disallow: /checkout/
+Disallow: /quick-view/
+Disallow: /espiar/
+
+# Búsqueda interna
+Disallow: /s?
+
+# Facetas y ordenamientos (NO rastreables)
+Disallow: /*?*facets=
+Disallow: /*?*sort=
+Disallow: /*?*category-
+
+# Paginación (SÍ rastreable)
+Allow: /*?page=
+
+# APIs
+Disallow: /api/
+
+# Colecciones no SEO
+Disallow: /coleccion/
+
+# Sitemaps
+Sitemap: https://www.exito.com/sitemap/sitemap.xml
+Sitemap: https://www.exito.com/friendly-collections.xml
