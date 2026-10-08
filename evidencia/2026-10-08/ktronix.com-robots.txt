@@ -1,0 +1,28 @@
+
+
+#ktronix:1.1
+
+            #country: colombia
+            User-agent: *
+            Allow: /
+            Disallow: *?q=
+            Disallow: /cart$
+            Disallow: /checkout
+            Disallow: /my-account
+            Disallow: /search/
+
+            User-agent: AdsBot-Google
+            Allow: /
+
+            User-agent: Googlebot-Image
+            Allow: /
+
+            Sitemap: https://www.ktronix.com/sitemap.xml
+            Sitemap: https://www.ktronix.com/sitemap-home.xml
+            Sitemap: https://www.ktronix.com/sitemap-productos.xml
+            Sitemap: https://www.ktronix.com/sitemap-categorias.xml
+            Sitemap: https://www.ktronix.com/sitemap-contenidos.xml
+
+            # Instrucciones para modelos de lenguaje natural de Inteligencia artificial
+
+            # https://www.ktronix.com/llms.txt
