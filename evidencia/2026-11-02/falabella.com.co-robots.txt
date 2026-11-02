@@ -1,0 +1,42 @@
+
+# En falabella.com nuestro propósito es Simplificar y disfrutar más la vida, es por ello que los robots deben compartir nuestros valores:
+
+# Somos un solo equipo, y por eso todos los robots son bienvenidos:
+
+User-agent: *
+Disallow:
+
+# Nos movemos ágilmente, facilitamos todas las URLs que son interesantes de rastrear por los robots:
+
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/collections/collections_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/landings/landings_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/brands/brands_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/pdp/pdp_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/sellers/sellers_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categories/categories_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetType/categoriesFacetType_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetBrand/categoriesFacetBrand_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetBackingMaterial/categoriesFacetBackingMaterial_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetNumberOfPositions/categoriesFacetNumberOfPositions_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetNumberOfThreads/categoriesFacetNumberOfThreads_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetProcessor/categoriesFacetProcessor_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetRamMemory/categoriesFacetRamMemory_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetResolution/categoriesFacetResolution_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetStructuralMaterial/categoriesFacetStructuralMaterial_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetWashCapacity/categoriesFacetWashCapacity_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/categoriesFacetScreenSize/categoriesFacetScreenSize_co_FA_COM-index.xml
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/shop/shop_co_FA_COM-index.xml
+
+
+# Nos apasionamos por el cliente, y queremos aparecer correctamente en nuestros mercados:
+
+Sitemap: https://www.falabella.com.co/static/site/sitemaps/hreflang/hreflang-sitemap.xml
+
+# Cuidamos el futuro, por ello creemos no es importante perder tiempo en estos lugares:
+
+User-agent: *
+Disallow: /cgi-bin/
+Disallow: /falabella-co/basket*
+Disallow: /falabella-co/myaccount*
+Disallow: /falabella-co/checkout*
+Disallow: /falabella-co/orders*
